@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+declare -a my_disks=( $(command ls -1 /dev/ | grep -Ei "^sd[a-z]*$") )
+
+for d in ${my_disks[@]} ; do
+
+ISTGUT=$(command smartctl -H /dev/${d} | grep PASSED | wc -l)
+NICHTGUT=$(command smartctl -H /dev/${d} | grep -i failed | wc -l)
+
+if (( ISTGUT != 0 )) ; then
+printf " /dev/${d} : $(tput setaf 2)GOOD$(tput sgr 0)\n"
+elif (( NICHTGUT != 0 )) ; then
+printf " /dev/${d} : $(tput setaf 1)FAILED$(tput sgr 0)\n"
+else
+printf " /dev/${d} : $(tput setaf 3)UNKNOWN$(tput sgr 0)\n"
+fi
+
+done
